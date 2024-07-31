@@ -6,6 +6,7 @@ use App\Jobs\SendEmailJob;
 use App\Rules\ReCaptchaV3;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Session;
 
 class RegistrationController extends Controller
 {
@@ -26,6 +27,9 @@ class RegistrationController extends Controller
 
     public function register()
     {
+        if(Session::has('loginId')){
+            Session::pull('loginId');
+        }
         return view('Register.register');
     }
 
@@ -43,7 +47,11 @@ class RegistrationController extends Controller
 
     public function verify(Request $request)
     {
-        return view('Register.captcha');
+        $email = $request->input('email');
+        $request->session()->put('loginId', $email);
+        echo "Challenge completed successfully!";
+        echo "<br>";
+        echo $request->session()->get('loginId')." is logged in";
     }
 
     public function captcha(Request $request)
